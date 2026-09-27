@@ -62,6 +62,8 @@ namespace ShiftingMetropolis.Battle
         bool raidStop;
         bool raidWon;
         bool raidLeave;
+        ShadowQuality savedShadowQuality;
+        bool mobileRaidQualityApplied;
         UltimateSkillDefinition currentUltimate;
         UltimateSkillDefinition castUltimate;
         bool resumeSkipBeginTurn;
@@ -216,6 +218,7 @@ namespace ShiftingMetropolis.Battle
                 raidMode = false;
                 BattleStage.RaidMode = false;
                 BattleHudSkin.ClearRaid();
+                RestoreMobileRaidQuality();
                 return;
             }
             if (sessionEntered && !battleOver && player != null && enemy != null && player.IsAlive && enemy.IsAlive)
@@ -270,6 +273,7 @@ namespace ShiftingMetropolis.Battle
             StopAllCoroutines();
             raidMode = true;
             BattleStage.RaidMode = true;
+            ApplyMobileRaidQuality();
             RaidSync.ResetBattleSession();
             var pause = RaidStore.PeekPause();
             bool resume = pause != null;
@@ -294,6 +298,21 @@ namespace ShiftingMetropolis.Battle
             SyncAilments();
             Talk(enemy, resume ? "……まだ、倒れてはいない。" : "……まとめて、かかってこい。");
             StartCoroutine(BattleLoop());
+        }
+
+        void ApplyMobileRaidQuality()
+        {
+            if (!Application.isMobilePlatform || mobileRaidQualityApplied) return;
+            savedShadowQuality = QualitySettings.shadows;
+            QualitySettings.shadows = ShadowQuality.Disable;
+            mobileRaidQualityApplied = true;
+        }
+
+        void RestoreMobileRaidQuality()
+        {
+            if (!mobileRaidQualityApplied) return;
+            QualitySettings.shadows = savedShadowQuality;
+            mobileRaidQualityApplied = false;
         }
 
         void SetupRaidCharacters()

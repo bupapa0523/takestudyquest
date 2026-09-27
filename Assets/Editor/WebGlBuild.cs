@@ -32,6 +32,7 @@ namespace ShiftingMetropolis.EditorTools
                 target = BuildTarget.WebGL,
                 options = BuildOptions.None
             };
+            PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Disabled;
             BuildReport report = BuildPipeline.BuildPlayer(options);
             if (report.summary.result != BuildResult.Succeeded)
             {

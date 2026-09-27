@@ -55,11 +55,15 @@ namespace ShiftingMetropolis.Battle
         static Text raidName;
         static Text raidNums;
         static Text raidTurns;
+        static int lastRaidHp = -1;
+        static int lastRaidMax = -1;
+        static Transform battleCanvasRoot;
 
         public static void Apply()
         {
             var canvas = GameObject.Find("BattleCanvas");
             if (canvas == null) return;
+            battleCanvasRoot = canvas.transform;
             EnsureSprites();
             var c = canvas.GetComponent<Canvas>();
             if (c != null) c.pixelPerfect = false;
@@ -205,8 +209,7 @@ namespace ShiftingMetropolis.Battle
             if (resultSub != null) resultSub.text = sub ?? "";
             commandMode = false;
             RefreshMode();
-            var canvas = GameObject.Find("BattleCanvas");
-            if (canvas != null) RaiseHome(canvas.transform);
+            if (battleCanvasRoot != null) RaiseHome(battleCanvasRoot);
         }
 
         static void RaiseHome(Transform root)
@@ -238,7 +241,7 @@ namespace ShiftingMetropolis.Battle
             ApplyBar(slider, ratio, col);
             if (num != null)
             {
-                num.text = hp + "/" + max;
+                num.text = string.Format("{0}/{1}", hp, max);
                 num.color = col;
             }
         }
@@ -1013,6 +1016,9 @@ namespace ShiftingMetropolis.Battle
             raidName = null;
             raidNums = null;
             raidTurns = null;
+            battleCanvasRoot = null;
+            lastRaidHp = -1;
+            lastRaidMax = -1;
         }
 
         static void ApplyRaidChrome(Transform root)
@@ -1064,8 +1070,6 @@ namespace ShiftingMetropolis.Battle
                 cr.offsetMax = Vector2.zero;
                 raidCore = coreGo.GetComponent<Image>();
                 raidCore.color = new Color(1f, 0.95f, 0.8f, 0.85f);
-                var pulse = raidRoot.AddComponent<RaidDynamaxPulse>();
-                pulse.core = raidCore;
                 raidName = EnsureText(raidRoot.transform, "RaidName", 0.03f, 0.42f, 0.46f, 0.96f, 15, Color.white, TextAnchor.MiddleLeft);
                 raidTurns = EnsureText(raidRoot.transform, "RaidTurns", 0.46f, 0.42f, 0.62f, 0.96f, 12, new Color(1f, 0.82f, 0.55f), TextAnchor.MiddleCenter);
                 raidNums = EnsureText(raidRoot.transform, "RaidNums", 0.62f, 0.42f, 0.97f, 0.96f, 13, new Color(1f, 0.86f, 0.86f), TextAnchor.MiddleRight);
@@ -1086,10 +1090,12 @@ namespace ShiftingMetropolis.Battle
 
         static void SetRaidHp(float ratio, int hp, int max)
         {
+            if (hp == lastRaidHp && max == lastRaidMax) return;
+            lastRaidHp = hp;
+            lastRaidMax = max;
             if (raidRoot == null)
             {
-                var canvas = GameObject.Find("BattleCanvas");
-                if (canvas != null) ApplyRaidChrome(canvas.transform);
+                if (battleCanvasRoot != null) ApplyRaidChrome(battleCanvasRoot);
             }
             if (raidName != null)
                 raidName.text = string.IsNullOrEmpty(BattleStage.EnemyLabel) ? "巨影" : BattleStage.EnemyLabel;
@@ -1104,21 +1110,8 @@ namespace ShiftingMetropolis.Battle
                         : new Color(0.55f, 0.04f, 0.07f, 1f);
             }
             if (raidNums != null)
-                raidNums.text = RaidRules.FormatHp(hp) + "  /  " + RaidRules.FormatHp(max);
+                raidNums.text = string.Format("{0}  /  {1}", RaidRules.FormatHp(hp), RaidRules.FormatHp(max));
         }
     }
 
-    public class RaidDynamaxPulse : MonoBehaviour
-    {
-        public Image core;
-
-        void Update()
-        {
-            if (core == null) return;
-            float wave = 0.45f + Mathf.Sin(Time.unscaledTime * 3.4f) * 0.35f;
-            var color = core.color;
-            color.a = wave;
-            core.color = color;
-        }
-    }
 }

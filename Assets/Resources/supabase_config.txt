@@ -1,0 +1,3 @@
+# url= にプロジェクトURL。key は publishable key。
+url=https://eqodgykpouofmvzrjsnp.supabase.co
+key=sb_publishable_hgcYNjra6cwYKZzS3X9Qxw_HQuoYXwl

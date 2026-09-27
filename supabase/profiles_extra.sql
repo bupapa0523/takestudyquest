@@ -1,0 +1,10 @@
+alter table public.profiles add column if not exists bio text not null default '';
+alter table public.profiles add column if not exists school text not null default '';
+alter table public.profiles add column if not exists goal text not null default '';
+alter table public.profiles add column if not exists daily_goal int not null default 0;
+alter table public.profiles add column if not exists weekly_goal int not null default 0;
+alter table public.profiles add column if not exists week_minutes int not null default 0;
+alter table public.profiles add column if not exists lifetime_minutes int not null default 0;
+alter table public.profiles add column if not exists look_csv text not null default '';
+alter table public.profiles add column if not exists skills_csv text not null default '';
+alter table public.profiles add column if not exists cosmetics_csv text not null default '';

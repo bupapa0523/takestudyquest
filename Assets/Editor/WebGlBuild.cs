@@ -59,6 +59,8 @@ namespace ShiftingMetropolis.EditorTools
                         "\n    <link rel=\"apple-touch-icon\" href=\"TemplateData/favicon.ico\">");
                     File.WriteAllText(indexPath, html);
                 }
+                html = html.Replace("// config.devicePixelRatio = 1;", "config.devicePixelRatio = 1;");
+                File.WriteAllText(indexPath, html);
             }
 
             string manifest = "{\n" +
